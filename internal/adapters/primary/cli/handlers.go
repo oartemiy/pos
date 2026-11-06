@@ -18,7 +18,7 @@ func (a *App) addStudent(ctx context.Context) error {
 	if in.FirstName, err = a.in.line("Имя"); err != nil {
 		return err
 	}
-	if in.Patronumic, err = a.in.line("Отчество (Enter — нет)"); err != nil {
+	if in.Patronymic, err = a.in.line("Отчество (Enter — нет)"); err != nil {
 		return err
 	}
 	if in.Email, err = a.in.line("Email"); err != nil {
@@ -76,7 +76,7 @@ func (a *App) addCriterion(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	a.out.success("Критерий «%s» добавлен: максимум %s, вес %s", c.Name, num(c.MaxWeight), num(c.Weight))
+	a.out.success("Критерий «%s» добавлен: максимум %s, вес %s", c.Name, num(c.MaxScore), num(c.Weight))
 	return nil
 }
 
@@ -115,7 +115,7 @@ func (a *App) setEvaluation(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	score, err := a.in.number(fmt.Sprintf("Балл (0–%s)", num(c.MaxWeight)))
+	score, err := a.in.number(fmt.Sprintf("Балл (0–%s)", num(c.MaxScore)))
 	if err != nil {
 		return err
 	}

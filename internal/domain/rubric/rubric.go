@@ -21,7 +21,8 @@ func New(title string) (*Rubric, error) {
 }
 
 func Restore(id shared.ID, title string, criteria []Criterion) (*Rubric, error) {
-	r := &Rubric{id, title, criteria}
+	r := &Rubric{id: id, title: title}
+	r.criteria = make([]Criterion, 0, len(criteria))
 	for _, c := range criteria {
 		if r.hasName(c.name, c.id) {
 			return nil, shared.ErrDuplicateCriterion

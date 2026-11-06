@@ -9,6 +9,6 @@ type AddCriterionInput struct {
 type CriterionView struct {
 	ID        string
 	Name      string
-	MaxWeight float64
+	MaxScore float64
 	Weight    float64
 }

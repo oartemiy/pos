@@ -33,7 +33,7 @@ func toStudent(r studentRecord) (*student.Student, error) {
 	if err != nil {
 		return nil, fmt.Errorf("jsonfile: student %q: %w", r.ID, err)
 	}
-	name, err := shared.NewName(r.LastName, r.FirstName, r.Patronymic)
+	name, err := shared.NewName(r.FirstName, r.LastName, r.Patronymic)
 	if err != nil {
 		return nil, fmt.Errorf("jsonfile: student %q: %w", r.ID, err)
 	}

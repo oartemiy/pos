@@ -43,7 +43,7 @@ func (r *StudentRepo) FindByEmail(ctx context.Context, email shared.Email) (*stu
 }
 
 func (r *StudentRepo) List(ctx context.Context) ([]*student.Student, error) {
-	items, err := r.store.load()
+	items, err := r.store.read(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +65,7 @@ func (r *StudentRepo) Delete(ctx context.Context, id shared.ID) error {
 				return append(items[:i], items[i+1:]...), nil
 			}
 		}
-		return nil, shared.ErrStudentNotFound
+		return nil, shared.ErrNotFound
 	})
 }
 
@@ -79,5 +79,5 @@ func (r *StudentRepo) findOnce(ctx context.Context, matchFn func(studentRecord) 
 			return toStudent(rec)
 		}
 	}
-	return nil, shared.ErrStudentNotFound
+	return nil, shared.ErrNotFound
 }

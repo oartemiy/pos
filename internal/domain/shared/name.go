@@ -61,12 +61,31 @@ func normalizePart(raw string, required bool) (string, error) {
 	if utf8.RuneCountInString(v) > maxNamePartLen {
 		return "", ErrNameTooLong
 	}
+	// Часть имени — слова из букв, разделённые одиночными «-», «'» или пробелом
+	// («Римский-Корсаков», «O'Neil», «Анна Мария»): начинается и заканчивается
+	// буквой, двух разделителей подряд нет.
+	prevSep := true // в начале строки разделитель запрещён
 	for _, r := range v {
-		if !unicode.IsLetter(r) && r != '-' && r != ' ' && r != '\'' {
+		switch {
+		case unicode.IsLetter(r):
+			prevSep = false
+		case isNameSeparator(r):
+			if prevSep {
+				return "", ErrInvalidName
+			}
+			prevSep = true
+		default:
 			return "", ErrInvalidName
 		}
 	}
+	if prevSep { // разделитель в конце строки
+		return "", ErrInvalidName
+	}
 	return v, nil
+}
+
+func isNameSeparator(r rune) bool {
+	return r == '-' || r == ' ' || r == '\''
 }
 
 func initial(s string) string {

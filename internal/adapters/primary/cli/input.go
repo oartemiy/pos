@@ -2,6 +2,7 @@ package cli
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"io"
 	"strconv"
@@ -9,24 +10,64 @@ import (
 )
 
 type input struct {
-	sc  *bufio.Scanner
-	out io.Writer
+	r     io.Reader
+	out   io.Writer
+	lines chan readResult
+	done  <-chan struct{} // закрывается по Ctrl+C; nil — ожидание без отмены
+}
+
+type readResult struct {
+	text string
+	err  error
 }
 
 func newInput(r io.Reader, w io.Writer) *input {
-	return &input{bufio.NewScanner(r), w}
+	return &input{r: r, out: w}
 }
 
-// line печатает подсказку и читает строку. Конец ввода (Ctrl+D) — io.EOF.
-func (in *input) line(promt string) (string, error) {
-	fmt.Fprintf(in.out, "%s: ", promt)
-	if !in.sc.Scan() {
-		if err := in.sc.Err(); err != nil {
-			return "", err
+// bind связывает ввод с контекстом: после его отмены line сразу
+// возвращает ошибку контекста, не дожидаясь, пока пользователь нажмёт Enter.
+func (in *input) bind(ctx context.Context) {
+	in.done = ctx.Done()
+}
+
+// start запускает чтение в отдельной горутине: блокирующий Scan
+// нельзя прервать, а чтение из канала — можно.
+func (in *input) start() {
+	in.lines = make(chan readResult)
+	go func() {
+		defer close(in.lines)
+		sc := bufio.NewScanner(in.r)
+		for sc.Scan() {
+			in.lines <- readResult{text: sc.Text()}
 		}
-		return "", io.EOF
+		err := sc.Err()
+		if err == nil {
+			err = io.EOF
+		}
+		in.lines <- readResult{err: err}
+	}()
+}
+
+// line печатает подсказку и читает строку. Конец ввода (Ctrl+D) — io.EOF,
+// отмена контекста (Ctrl+C) — context.Canceled.
+func (in *input) line(promt string) (string, error) {
+	if in.lines == nil {
+		in.start()
 	}
-	return strings.TrimSpace(in.sc.Text()), nil
+	fmt.Fprintf(in.out, "%s: ", promt)
+	select {
+	case res, ok := <-in.lines:
+		if !ok {
+			return "", io.EOF
+		}
+		if res.err != nil {
+			return "", res.err
+		}
+		return strings.TrimSpace(res.text), nil
+	case <-in.done:
+		return "", context.Canceled
+	}
 }
 
 // number читает число, принимая и точку, и запятую. Пустой ввод — отмена.

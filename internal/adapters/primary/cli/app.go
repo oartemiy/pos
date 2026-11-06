@@ -56,8 +56,12 @@ func New(f *facade.Facade, r io.Reader, w io.Writer) *App {
 // Run — главный цикл. Ошибки сценариев (например, «балл выходит за пределы
 // критерия») выводятся пользователю, и программа продолжает работу.
 func (a *App) Run(ctx context.Context) error {
+	a.in.bind(ctx)
 	a.out.title("ПОС — преподавательская оценка студентов")
 	for {
+		if err := ctx.Err(); err != nil {
+			return a.stop(err)
+		}
 		a.out.menu(a.commands)
 		choice, err := a.in.line("Пункт меню")
 		if err != nil {
@@ -76,7 +80,7 @@ func (a *App) Run(ctx context.Context) error {
 		a.out.section(cmd.title)
 		switch err := cmd.run(ctx); {
 		case err == nil:
-		case errors.Is(err, io.EOF):
+		case errors.Is(err, io.EOF), ctx.Err() != nil:
 			return a.stop(err)
 		case errors.Is(err, errCancelled):
 			a.out.info("Действие отменено")
@@ -95,10 +99,10 @@ func (a *App) find(key string) (command, bool) {
 	return command{}, false
 }
 
-// stop завершает работу: конец ввода (пункт «0» или Ctrl+D) — штатный выход,
-// любая другая ошибка ввода возвращается в main.
+// stop завершает работу: конец ввода (пункт «0» или Ctrl+D) и Ctrl+C —
+// штатный выход, любая другая ошибка ввода возвращается в main.
 func (a *App) stop(err error) error {
-	if errors.Is(err, io.EOF) {
+	if errors.Is(err, io.EOF) || errors.Is(err, context.Canceled) {
 		a.out.println("\nДо встречи!")
 		return nil
 	}

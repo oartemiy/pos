@@ -21,7 +21,7 @@ func NewStudents (s student.Repository, e evaluation.Repository) *Students {
 }
 
 func (uc *Students) Add(ctx context.Context, in dto.AddStudentInput) (dto.StudentView, error) {
-	name, err := shared.NewName(in.FirstName, in.LastName, in.Patronumic)
+	name, err := shared.NewName(in.FirstName, in.LastName, in.Patronymic)
 	if err != nil {
 		return dto.StudentView{}, err
 	}

@@ -99,7 +99,7 @@ func toCriterionView(c rubric.Criterion) dto.CriterionView {
 	return dto.CriterionView{
 		ID:        c.ID().String(),
 		Name:      c.Name(),
-		MaxWeight: c.MaxScore().Value(),
+		MaxScore: c.MaxScore().Value(),
 		Weight:    c.Weight().Value(),
 	}
 }

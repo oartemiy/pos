@@ -11,7 +11,7 @@ func NewID() ID {
 }
 
 func (id ID) String() string {
-	return id.String()
+	return uuid.UUID(id).String()
 }
 
 func ParseID(raw string) (ID, error) {

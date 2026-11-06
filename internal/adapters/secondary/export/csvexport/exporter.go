@@ -44,12 +44,12 @@ func (e *Exporter) Export(ctx context.Context, rows []dto.TotalRow) (string, err
 	}
 
 	for _, row := range rows {
-		record := []string{row.StudentName,
-			row.Email,
+		record := []string{safeCell(row.StudentName),
+			safeCell(row.Email),
 			formatScore(row.Value),
 			strconv.Itoa(row.Graded),
 			strconv.Itoa(row.Criteria),
-			row.Strategy}
+			safeCell(row.Strategy)}
 		if err := w.Write(record); err != nil {
 			return "", fmt.Errorf("csvexport: %w", err)
 		}
@@ -70,6 +70,17 @@ func (e *Exporter) Export(ctx context.Context, rows []dto.TotalRow) (string, err
 // Сам итог в домене хранится точным — округление только на границе.
 func formatScore(v float64) string {
 	return strings.Replace(strconv.FormatFloat(v, 'f', 2, 64), ".", ",", 1)
+}
+
+// safeCell защищает от CSV-инъекции: Excel и LibreOffice считают ячейку,
+// начинающуюся с «=», «+», «-», «@», табуляции или перевода строки, формулой
+// (например, email «=1+2@x.ru» корректен, но превратится в вычисление).
+// Апостроф в начале заставляет показать значение как текст.
+func safeCell(s string) string {
+	if s != "" && strings.ContainsRune("=+-@\t\r", rune(s[0])) {
+		return "'" + s
+	}
+	return s
 }
 
 func writeAtomic(path string, data []byte) error {

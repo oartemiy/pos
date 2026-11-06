@@ -16,8 +16,8 @@ import (
 func (a *App) runDemo(ctx context.Context) error {
 	a.out.info("Шаг 1. Заводим студентов")
 	studentInputs := []dto.AddStudentInput{
-		{LastName: "Иванов", FirstName: "Иван", Patronumic: "Петрович", Email: "ivan.ivanov@edu.hse.ru"},
-		{LastName: "Петрова", FirstName: "Анна", Patronumic: "Сергеевна", Email: "anna.petrova@edu.hse.ru"},
+		{LastName: "Иванов", FirstName: "Иван", Patronymic: "Петрович", Email: "ivan.ivanov@edu.hse.ru"},
+		{LastName: "Петрова", FirstName: "Анна", Patronymic: "Сергеевна", Email: "anna.petrova@edu.hse.ru"},
 		{LastName: "Smith", FirstName: "John", Email: "john.smith@edu.hse.ru"},
 	}
 	students := make([]dto.StudentView, 0, len(studentInputs))
@@ -42,7 +42,7 @@ func (a *App) runDemo(ctx context.Context) error {
 		if err != nil {
 			return err
 		}
-		a.out.success("«%s»: максимум %s, вес %s", c.Name, num(c.MaxWeight), num(c.Weight))
+		a.out.success("«%s»: максимум %s, вес %s", c.Name, num(c.MaxScore), num(c.Weight))
 		criteria = append(criteria, c)
 	}
 

@@ -77,7 +77,7 @@ func (o *output) criteria(list []dto.CriterionView) {
 	}
 	rows := make([][]string, 0, len(list))
 	for i, c := range list {
-		rows = append(rows, []string{strconv.Itoa(i + 1), c.Name, num(c.MaxWeight), num(c.Weight)})
+		rows = append(rows, []string{strconv.Itoa(i + 1), c.Name, num(c.MaxScore), num(c.Weight)})
 	}
 	o.table([]string{"№", "Критерий", "Максимум", "Вес"}, rows)
 }

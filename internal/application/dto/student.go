@@ -3,7 +3,7 @@ package dto
 type AddStudentInput struct {
 	LastName   string
 	FirstName  string
-	Patronumic string
+	Patronymic string
 	Email      string
 }
 
