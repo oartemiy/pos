@@ -1,4 +1,3 @@
-// Команда pos — консольное приложение «Преподавательская оценка студентов».
 package main
 
 import (
@@ -37,7 +36,6 @@ func run() error {
 		return err
 	}
 
-	// Invoke строит граф зависимостей и передаёт готовый фасад в CLI.
 	return container.Invoke(func(f *facade.Facade) error {
 		return cli.New(f, os.Stdin, os.Stdout).Run(ctx)
 	})
