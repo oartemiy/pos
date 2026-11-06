@@ -16,7 +16,7 @@ type Students struct {
 	evaluation evaluation.Repository
 }
 
-func NewStudent(s student.Repository, e evaluation.Repository) *Students {
+func NewStudents (s student.Repository, e evaluation.Repository) *Students {
 	return &Students{s, e}
 }
 
