@@ -65,7 +65,7 @@ func (r *StudentRepo) Delete(ctx context.Context, id shared.ID) error {
 				return append(items[:i], items[i+1:]...), nil
 			}
 		}
-		return nil, shared.ErrNotFound
+		return nil, shared.ErrStudentNotFound
 	})
 }
 
@@ -79,5 +79,5 @@ func (r *StudentRepo) findOnce(ctx context.Context, matchFn func(studentRecord) 
 			return toStudent(rec)
 		}
 	}
-	return nil, shared.ErrNotFound
+	return nil, shared.ErrStudentNotFound
 }
